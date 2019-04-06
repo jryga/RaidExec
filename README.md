@@ -12,9 +12,9 @@ For an indepth overview of complete functionality you can read the [requirement 
  
 Originally, there was a server for this hosted on Azure.  That server has long since been taken down due to fiscal restraints.  Therefore, it must be run locally on visual studio.
 
-The default admmin accout is:
-User: wierdo1111
-Password: Password123! 
+The default admmin accout is:  
+User: wierdo1111  
+Password: Password123!  
 
 More users can be created as needed.
 
