@@ -1,0 +1,114 @@
+﻿@model RaidExec.Controllers.EventDetails
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2> Delete @Model.Name</h2>
+
+
+<br />
+<div class="well">
+    <h4>Are you sure about this?</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Creator)
+        </dt>
+
+        <dd>
+            @Html.ActionLink(Model.Creator.Name, "Details", "UserAccounts", new { id = Model.Creator.Id }, new { @style = "width:100%;" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.GameName)
+        </dt>
+
+        <dd>
+            @Html.ActionLink(Model.GameName, "Details", "Games", new { id = Model.GameId }, new { @style = "width:100%;" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SizeLimit)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SizeLimit)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateCreated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DateCreated)
+        </dd>
+
+        <br>
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            <div class="panel panel-default">
+                <div class="panel-body">@Html.Raw(Model.Description)</div>
+            </div>
+        </dd>
+
+        <br>
+        <dt>
+            @Html.DisplayNameFor(model => model.Raids)
+        </dt>
+
+        <dd>
+            <table class="table custom-table">
+                <tr>
+                    <th>
+                        <p>Leader</p>
+                    </th>
+                    <th>
+                        <p>Scheduled Time</p>
+                    </th>
+                    <th>
+                        <p>Spots Remaining</p>
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+
+                @foreach (var item in Model.Raids)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Leader.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ScheduledTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SpotsRemaining)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Details", "Details", "Raids", new { id = item.Id }, null)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+    <hr>
+    <div class="full-center-spaced">
+        <input type="submit" value="Delete" class="btn btn-success" />
+        @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-danger" })
+    </div>
+    }
+</div>
+<div>
+    @Html.ActionLink("Return", "Index", null, new { @class = "btn btn-warning" })
+</div>

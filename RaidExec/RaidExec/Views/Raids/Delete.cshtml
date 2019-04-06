@@ -1,0 +1,191 @@
+﻿@model RaidExec.Controllers.RaidDetails
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2> Delete @Model.Event.Name</h2>
+
+
+<br />
+<div class="well">
+    <h4>Are you sure about this?</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Event)
+        </dt>
+
+        <dd>
+            @Html.ActionLink(Model.Event.Name, "Details", "Events", new { id = Model.Event.Id }, new { @style = "width:100%;" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Game)
+        </dt>
+
+        <dd>
+            @Html.ActionLink(Model.Game.Name, "Details", "Games", new { id = Model.Game.Id }, new { @style = "width:100%;" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Leader)
+        </dt>
+
+        <dd>
+            @Html.ActionLink(Model.Leader.Name, "Details", "Characters", new { id = Model.Leader.Id }, new { @style = "width:100%;" })
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ScheduledTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ScheduledTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Size)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Size)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SpotsRemaining)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SpotsRemaining)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SizeLimit)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SizeLimit)
+        </dd>
+
+        @if (Model.Members.Count() > 0)
+            {
+            <br>
+            <dt>
+                @Html.DisplayNameFor(model => model.Members)
+            </dt>
+
+            <dd>
+                <table class="table custom-table" style="margin:0;">
+                    <tr>
+                        <th style="width:50%;">
+                            Member
+                        </th>
+                        <th></th>
+                    </tr>
+                    @foreach (var member in Model.Members)
+                    {
+                        <tr>
+                            <td style="width:50%;">
+                                @Html.ActionLink(member.Name, "Details", "Characters", new { id = member.Id }, new { @style = "width:100%;" })
+                            </td>
+                            <td>
+                                @if (member.Name != Model.Leader.Name && Model.Leader.UserAccount.Name == HttpContext.Current.User.Identity.Name)
+                                {
+                                    @Html.ActionLink("Kick", "RaidKick", new { cid = member.Id, rid = Model.Id }, new { @class = "btn btn-danger other-action" })
+                                }
+                                @if (member.UserAccount.Name == HttpContext.Current.User.Identity.Name && member.Name != Model.Leader.Name)
+                                {
+                                    @Html.ActionLink("Leave", "RaidLeave", new { cid = member }, new { @class = "btn btn-danger other-action" })
+                                }
+                            </td>
+                        </tr>
+                    }
+
+                </table>
+
+            </dd>
+        }
+
+        @if (HttpContext.Current.User.Identity.Name == Model.Leader.UserAccount.Name)
+        {
+            if (Model.Invites.Count() > 0)
+            {
+                <br>
+                <dt>
+                    @Html.DisplayNameFor(model => Model.Invites)
+                </dt>
+
+                <dd>
+
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th style="width:50%;">
+                                Character
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var invite in Model.Invites)
+                    {
+                            <tr>
+                                <td style="width:50%;">
+                                    @Html.ActionLink(invite.Character.Name, "Details", "Characters", new { id = invite.Character.Id }, new { @style = "width:100%;" })
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Cancel", "RaidCancelInv", new { id = invite.Id }, new { @class = "btn btn-danger other-action" })
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                </dd>
+            }
+
+            if (Model.Applications.Count() > 0)
+            {
+                <br>
+                <dt>
+                    @Html.DisplayNameFor(model => Model.Applications)
+                </dt>
+
+                <dd>
+
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th style="width:50%;">
+                                Character
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var invite in Model.Applications)
+                    {
+                            <tr>
+                                <td style="width:50%;">
+                                    @Html.ActionLink(invite.Character.Name, "Details", "Characters", new { id = invite.Character.Id }, new { @style = "width:100%;" })
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Accept", "AcceptApplication", new { id = invite.Id }, new { @class = "btn btn-success other-action" })
+                                    @Html.ActionLink("Decline", "DenyApplication", new { id = invite.Id }, new { @class = "btn btn-danger other-action" })
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                </dd>
+            }
+        }
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <hr>
+        <div class="full-center-spaced">
+            <input type="submit" value="Delete" class="btn btn-success" />
+            @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-danger" })
+        </div>
+    }
+</div>
+<div>
+    @Html.ActionLink("Return", "Index", null, new { @class = "btn btn-warning" })
+</div>

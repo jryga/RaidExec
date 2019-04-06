@@ -1,0 +1,47 @@
+﻿@model RaidExec.Controllers.GuildEditForm
+@{
+    ViewBag.Title = "GuildEdit";
+}
+<h2>Guild Edit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Guild Edit Form</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-4 well img-rounded">
+                <h4>Character Roster</h4>
+                @foreach (var item in Model.Characters)
+                {
+                    if (item.Id != Model.Leader.Id)
+                    {
+                        <span>@item.Name @Html.ActionLink("Remove from Guild", "Leave", new { name = item.Name, id = Model.Id, gId = Model.GameId }) </span><br />
+                    }
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,112 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
+
+.full-center-spaced {
+    display: flex;
+    align-items: center; /* align vertical */
+    justify-content: space-between;
+    margin: 0;
+}
+
+.full-center {
+    display: flex;
+    align-items: center; /* align vertical */
+    justify-content:center;
+}
+
+.select2-container {
+    min-height: 38px !important;
+    min-width: 320px !important;
+}
+
+.select2-selection {
+    min-height: 38px !important;
+    border-color: white !important;
+}
+
+
+.select2-selection__rendered, .select2-selection__arrow {
+     margin-top: 4px !important;
+}
+
+.select2, .select2-results  {
+    color: black !important;
+}
+
+.game-filter-select .select2-container {
+    min-width: 320px !important;
+}
+
+.game-filter-select .select2-selection {
+    min-width: 320px !important;
+    border-radius: 0 4px 4px 0 !important;
+}
+
+.game-filter-select .select2-selection__choice {
+    margin-top: 2px !important;
+}
+
+.custom-table th {
+    background-color: red;
+         font-size: 130%;
+     text-align: center;
+}
+
+.custom-table td {
+    border: solid 2px #151515;
+    text-align:center;
+}
+
+.custom-table td:first-child {
+     font-size: 130%;
+}
+
+.custom-table tr:not(:hover) td:first-child{
+    border-left-color: black;
+}
+
+.custom-table tr:not(:hover) td:last-child {
+     border-right-color: black;
+}
+
+.custom-table tr:last-child:not(:hover) > td {
+   border-bottom-color: black;
+}
+
+.custom-table tr:hover > td {
+    background: #151515;
+    border-color: black;
+}
+
+.btn-default {
+    color: black;
+}

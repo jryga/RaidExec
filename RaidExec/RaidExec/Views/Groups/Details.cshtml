@@ -1,0 +1,153 @@
+﻿@model RaidExec.Controllers.GroupDetails
+
+@{
+    ViewBag.Title = "GroupDetails";
+}
+
+@Scripts.Render("~/bundles/jquery")
+
+<h2>@Model.Leader.Name's Group</h2>
+<div class="well">
+    <h4>Roster information</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        @if (Model.Members.Count() > 0)
+            {
+            <br>
+            <dt>
+                @Html.DisplayNameFor(model => model.Members)
+            </dt>
+
+            <dd>
+                <table class="table custom-table" style="margin:0;">
+                    <tr>
+                        <th style="width:50%;">
+                            Member
+                        </th>
+                        <th></th>
+                    </tr>
+                    @foreach (var member in Model.Members)
+                    {
+                        <tr>
+                            <td style="width:50%;">
+                                @Html.ActionLink(member.Name, "Details", "Characters", new { id = member.Id }, new { @style = "width:100%;" })
+                            </td>
+                            <td>
+                                @if (member.Name != Model.Leader.Name && Model.Leader.UserAccount.Name == HttpContext.Current.User.Identity.Name)
+                                {
+                                    @Html.ActionLink("Kick", "GroupKick", new { cid = member.Id, rid = Model.Id }, new { @class = "btn btn-danger other-action" })
+                                }
+                                @if (member.UserAccount.Name == HttpContext.Current.User.Identity.Name && member.Name != Model.Leader.Name)
+                                {
+                                    @Html.ActionLink("Leave", "GroupLeave", new { cid = member.Id }, new { @class = "btn btn-danger other-action" })
+                                }
+                            </td>
+                        </tr>
+                    }
+
+                </table>
+
+            </dd>
+        }
+
+        @if (HttpContext.Current.User.Identity.Name == Model.Leader.UserAccount.Name)
+        {
+            if (Model.Invites.Count() > 0)
+            {
+                <br>
+                <dt>
+                    @Html.DisplayNameFor(model => Model.Invites)
+                </dt>
+
+                <dd>
+
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th style="width:50%;">
+                                Character
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var invite in Model.Invites)
+                    {
+                            <tr>
+                                <td style="width:50%;">
+                                    @Html.ActionLink(invite.Character.Name, "Details", "Characters", new { id = invite.Character.Id }, new { @style = "width:100%;" })
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Cancel", "GroupCancelInv", new { id = invite.Id }, new { @class = "btn btn-danger other-action" })
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                </dd>
+            }
+
+            if (Model.Applications.Count() > 0)
+            {
+                <br>
+                <dt>
+                    @Html.DisplayNameFor(model => Model.Applications)
+                </dt>
+
+                <dd>
+
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th style="width:50%;">
+                                Character
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var invite in Model.Applications)
+                    {
+                            <tr>
+                                <td style="width:50%;">
+                                    @Html.ActionLink(invite.Character.Name, "Details", "Characters", new { id = invite.Character.Id }, new { @style = "width:100%;" })
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Accept", "AcceptApplication", new { id = invite.Id }, new { @class = "btn btn-success other-action" })
+                                    @Html.ActionLink("Decline", "DenyApplication", new { id = invite.Id }, new { @class = "btn btn-danger other-action" })
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                </dd>
+            }
+        }
+    </dl>
+    @if (Model.Leader.UserAccount.Name == HttpContext.Current.User.Identity.Name)
+    {
+     <hr>
+           @Html.ActionLink("Invite", "GroupInvite", new { id = Model.Id }, new { @class = "btn btn-primary" })
+    }
+</div>
+<p>
+    @Html.ActionLink("Return to Home", "Index", "Home", null, new { @class = "btn btn-warning" })
+</p>
+
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        $(".other-action").click(function (e) {
+
+            var self = $(this);
+
+            e.preventDefault();
+            $.ajax({
+
+                url: self.attr("href"),
+                success: function (data) {
+                    self.parent().html(data);
+                }
+            });
+        });
+
+    });
+</script>

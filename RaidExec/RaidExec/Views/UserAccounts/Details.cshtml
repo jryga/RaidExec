@@ -1,0 +1,64 @@
+﻿@model RaidExec.Controllers.UserAccountHome
+
+<h2>@Model.Name</h2>
+
+<br />
+<div class="well">
+    <h4>Account Details</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        @if (!Model.UrlImage.IsEmpty())
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.UrlImage)
+            </dt>
+
+            <dd>
+                <img src=@Model.UrlImage height="160" width="240" />
+            </dd>
+            <br>
+        }
+
+        <dt>
+            Characters
+        </dt>
+
+        <dd>
+            <table class="table custom-table" style="margin:0;">
+                <tr>
+                    <th style="width:33%;">
+                        Character
+                    </th>
+                    <th style="width:33%;">
+                        Game
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var member in Model.Characters)
+                {
+                    <tr>
+                        <td style="width:50%;">
+                           @member.Name
+                        </td>
+                        <td>
+                            @Html.ActionLink(member.Game.Name, "Details", "Games", new { id = member.Game.Id }, null)
+                        </td>
+                        <td>
+                            @Html.ActionLink("View Details", "Details", "Characters", new { id = member.Id }, new { @class = "btn btn-primary" })
+</td>
+                    </tr>
+                }
+
+            </table>
+        </dd>
+
+    </dl>
+    @if (Model.Name == User.Identity.Name)
+    {
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) 
+    }
+</div>
+<div>
+    @Html.ActionLink("Return", "Index", null, new { @class = "btn btn-warning" })
+</div>

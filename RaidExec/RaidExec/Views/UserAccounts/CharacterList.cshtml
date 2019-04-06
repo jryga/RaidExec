@@ -1,0 +1,52 @@
+﻿@model RaidExec.Controllers.UserAccountCharacter
+
+<div>
+    <h4>@Html.DisplayFor(model => model.Name) Character's</h4>
+    <hr />
+    @Html.ActionLink("Create Character", "CreateCharacter", new { id = Model.Id })
+    
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            Character Name
+        </th>
+        <th>
+            Level
+        </th>
+        <th>
+            Class
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Characters)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Level)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Class)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "CharacterEdit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "CharacterDetails", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "DeleteCharacter", new { userid = Model.Id, charid = item.Id  })
+            </td>
+        </tr>
+    }
+
+</table>
+
+
+
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,168 @@
+﻿@model RaidExec.Controllers.CharacterGuildFind
+
+@{
+    ViewBag.Title = "FindGuild";
+}
+
+@Scripts.Render("~/bundles/jquery")
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+
+<h2>Find Guilds</h2>
+<br>
+<div class="well">
+    <div class="full-center-spaced">
+        @Html.ActionLink("Create a Guild", "Create", null, new { @class = "btn btn-success" })
+        <div class="input-group" style="display:flex;">
+            <input id="name-filter" type="text" class="form-control" placeholder="Filter by name">
+        </div>
+    </div>
+    <br>
+    <div>
+        <table class="table custom-table" style="margin:0;">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Guilds)
+                </th>
+                <th>
+                    Leader
+                </th>
+                <th></th>
+            </tr>
+            @if (Model != null && Model.Guilds.Count() > 0)
+            {
+           foreach (var item in Model.Guilds.OrderBy(e => e.Name))
+            {
+                <tr class="row-tag">
+                    <td class="name-tag" style="height: 100%;">
+                        <div class="full-center" style="height: 100%; width:100%;">
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </div>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LeaderName)
+                    </td>
+                    <td>
+                        <div class="full-center-spaced">
+                            @Html.ActionLink("View Roster", "Details", new { id = item.Id }, new { @class = "btn btn-primary" })
+                            @if (User.IsInRole("Admin") || User.Identity.Name == item.Username)
+                            {
+                                <span>
+                                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+                                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
+                                </span>
+                            }
+                            @if (Model.Character.Guild == null)
+                            {
+                                <span>
+                                    @Html.ActionLink("Apply", "ApplyGuild", new { gid = item.Id, cid = Model.Character.Id }, new { @class = "btn btn-success apply-action" })
+                                </span>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            }
+            else
+            {
+                <p>There are no guilds available for this game.</p>
+            }
+        </table>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+        $(document).ready(function() {
+
+
+            $(".apply-action").click(function(e) {
+                e.preventDefault();
+
+                var self = $(this);
+
+                e.preventDefault();
+                $.ajax({
+
+                    url: self.attr("href"),
+                    success: function (data) {
+                        self.parent().html(data);
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Status: " + textStatus); alert("Error: " + errorThrown);
+                    }
+                });
+            });
+
+        });
+</script>
+
+<script type="text/javascript">
+
+    // These have to be outside
+
+    $('#game-filter').select2({
+        placeholder: "Filter by games",
+        allowClear: true // Broken
+    });
+
+    $('#game-filter').on('select2:select', function (e) {
+        if ($(this).val().length == 1) {
+            $(".row-tag").not("." + e.params.data.id).hide();
+        } else {
+            $("." + e.params.data.id).show();
+        }
+
+        var regex = new RegExp($("#name-filter").val(), "i");
+        $("." + e.params.data.id).each(function () {
+            if (!$(this).find(".name-tag").text().match(regex)) {
+                $(this).hide();
+            }
+        });
+    });
+
+    $('#game-filter').on('select2:unselect', function (e) {
+        if (!$(this).val()) {
+            $(".row-tag").show();
+
+            var regex = new RegExp($("#name-filter").val(), "i");
+            $(".row-tag").each(function () {
+                if (!$(this).find(".name-tag").text().match(regex)) {
+                    $(this).hide();
+                }
+            });
+        } else {
+            $("." + e.params.data.id).hide();
+        }
+    });
+
+    $("#name-filter").on("change keyup paste", function () {
+        var regex = new RegExp($(this).val(), "i");
+        var filters = $("#game-filter").val();
+
+        if (!filters) {
+            $(".row-tag").each(function () {
+                if (!$(this).find(".name-tag").text().match(regex)) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+        } else {
+            for (filter in filters) {
+                $("." + filters[filter]).each(function () {
+                    if ($(this).find(".name-tag").text().match(regex)) {
+                        $(this).show();
+                    }
+                    else {
+                        $(this).hide();
+                    }
+                });
+            }
+        }
+        });
+
+</script>

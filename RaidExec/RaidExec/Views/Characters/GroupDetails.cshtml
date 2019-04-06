@@ -1,0 +1,40 @@
+﻿@model RaidExec.Controllers.GroupAdd
+
+@{
+    ViewBag.Title = "GroupDetails";
+}
+
+<h2>Group Details</h2>
+
+<div>
+    <h4>GroupAdd</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.LeaderId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Leader.Name )
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Members )
+        </dt>
+        
+            @foreach (var m in Model.Members)
+            {
+                <dd>
+                    @Html.DisplayName(m.Name)
+                </dd>
+            }
+        
+
+    </dl>
+</div>
+<p>
+    @if (Model.invFlag)
+    {
+        @Html.ActionLink("Invite", "groupInvite", new { id = Model.Id })
+    }
+    <!--@Html.ActionLink("Back to List", "Index")-->
+</p>

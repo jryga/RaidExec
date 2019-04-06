@@ -1,0 +1,523 @@
+﻿
+@model RaidExec.Controllers.UserAccountHome
+
+@{
+    Layout = null;
+
+    int guildInvites = 0;
+    int groupInvites = 0;
+    int raidInvites = 0;
+    int raids = 0;
+    var chara = (Model.Characters.Count > 0) ? "#" + Model.Characters.ElementAt(0).Name : "";
+}
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/jquery")
+
+<div class="panel panel-default col-lg-3" style="padding:0;">
+    <div class="panel-heading">
+        <p class="full-center-text">
+            <span class="h4">Characters</span>
+            @Html.ActionLink("Add a Character", "CreateCharacter", "UserAccount", new { @class = "btn btn-success" })
+        </p>
+    </div>
+    <div class="panel-body">
+        <div class="well">
+            <ul class="nav nav-pills nav-stacked" style="margin:0;">
+                @foreach (var item in Model.Characters)
+            {
+                    <li id="@item.Name-pill"><a data-toggle="pill" href="#@item.Name-info">@item.Name</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="panel panel-default col-lg-4" style="padding:0;">
+    <div class="panel-heading">
+        <p class="full-center-text">
+            <span class="h4">Character Info</span>
+            @Html.ActionLink("My Account", "Details", "UserAccounts", new { id = Model.Id }, new { @class = "btn btn-primary" })
+        </p>
+    </div>
+    <div class="panel-body">
+        <div class="well">
+            <div class="tab-content">
+                @foreach (var item in Model.Characters)
+            {
+                    <div id="@item.Name-info" class="tab-pane fade">
+                        <p>Game: @Html.ActionLink(item.Game.Name, "Details", "Game", new { id = item.Game.Id }, null)</p>
+
+                        <p>
+                            Group:
+                            @if (item.Group != null)
+                            {
+                                @Html.ActionLink("View Group", "Details", "Groups", new { id = item.Group.Id }, null)
+                            }
+                            else
+                            {
+                                <span>None</span>
+                            }
+                        </p>
+
+                        <p>
+                            Guild:
+                            @if (item.Guild != null)
+                            {
+                                @Html.ActionLink(item.Guild.Name, "Details", "Guilds", new { id = item.Guild.Id }, null)
+                            }
+                            else
+                            {
+                                <span>None</span>
+                            }
+                        </p>
+
+
+                        <p>
+                            @if (item.Guild != null)
+                            {
+                                if (item.Guild.Leader.Id == item.Id)
+                                {
+                                    @Html.ActionLink("Disband Guild", "GuildDisband", "Guilds", new { id = item.Id }, new { @class = "btn btn-danger other-action" })
+                                }
+                                else
+                                {
+                                    @Html.ActionLink("Leave Guild", "GuildLeave", "Guilds", new { id = item.Id }, new { @class = "btn btn-danger other-action" })
+                                }
+                            }
+                            else
+                            {
+                                @Html.ActionLink("Find Guilds", "FindGuild", "Guilds", new { id = item.Id }, new { @class = "btn btn-success" })
+                                <span> </span>
+                                @Html.ActionLink("Create Guild", "AddGuild", "Guilds", new { id = item.Id }, new { @class = "btn btn-success" })
+                            }
+                        </p>
+                        <p>
+                            @if (item.Group != null)
+                            {
+                                if (item.Group.Leader.Id == item.Id)
+                                {
+                                    @Html.ActionLink("Disband Group", "GroupDisband", "Groups", new { id = item.Id }, new { @class = "btn btn-danger other-action" })
+                                }
+                                else
+                                {
+                                    @Html.ActionLink("Leave Group", "GroupLeave", "Groups", new { id = item.Id }, new { @class = "btn btn-danger other-action" })
+                                }
+                            }
+                            else
+                            {
+                                @Html.ActionLink("Find Group", "FindGroup", "Groups", new { id = item.Id }, new { @class = "btn btn-success" })
+                                <span> </span>
+                                <span>
+                                    @Html.ActionLink("Create Group", "AddGroup", "Groups", new { id = item.Id }, new { @class = "btn btn-success other-action" })
+                                    </span>
+                                    }
+</p>
+                        <p>
+                            @Html.ActionLink("View Full Details", "Details", "Characters", new { id = item.Id }, new { @class = "btn btn-success" })
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default col-lg-5" style="padding:0;">
+
+    <div class="panel-heading">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#menu1" class="link-tab">Guild <span id="guild-count" class="label label-warning">Loading</span></a></li>
+            <li><a data-toggle="tab" href="#menu2" class="link-tab">Group <span id="group-count" class="label label-warning">Loading</span></a></li>
+            <li><a data-toggle="tab" href="#menu3" class="link-tab">Raid <span id="raid-count" class="label label-warning">Loading</span></a></li>
+        </ul>
+    </div>
+
+    <div class="panel-body">
+        <div class="tab-content">
+            <div class="well" style="margin:0;">
+                <div id="menu1" class="tab-pane fade in active tab-invite">
+                    <div class="guild-invite-content">
+                        <h3 style="margin:0;">Invites</h3>
+                        <table class="table custom-table" style="margin:0;">
+                            <tr>
+                                <th>
+                                    To
+                                </th>
+                                <th>
+                                    Guild
+                                </th>
+                                <th>
+                                    Leader
+                                </th>
+                                <th></th>
+                            </tr>
+                            @foreach (var item in Model.Characters)
+                            {
+                                foreach (var invite in item.GuildInvites.Where(e => !e.Declined))
+                                {
+
+                                    guildInvites++;
+
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.ActionLink(invite.Guild.Name, "Details", "Guild", new { id = invite.Guild.Id }, null)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => invite.Guild.Leader.Name)
+                                        </td>
+                                        <td class="text-center">
+                                            @Html.ActionLink("Accept", "guildAccept", "Characters", new { id = invite.Id }, new { @class = "btn btn-success invite-action a-guild-inviteID-" + guildInvites })
+                                            @Html.ActionLink("Decline", "guildDecline", "Characters", new { id = invite.Id }, new { @class = "btn btn-danger invite-action d-guild-inviteID-" + guildInvites })
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </table>
+                    </div>
+                    <div class="guild-app-content">
+                        <h3>Applications</h3>
+                        <table class="table custom-table" style="margin:0;">
+                            <tr>
+                                <th>
+                                    For
+                                </th>
+                                <th>
+                                    Guild
+                                </th>
+                                <th>
+                                    Leader
+                                </th>
+                                <th></th>
+                            </tr>
+                            @foreach (var item in Model.Characters)
+                            {
+                                foreach (var invite in item.GuildApplications.Where(e => !e.Declined))
+                                {
+
+                                    guildInvites++;
+
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.ActionLink(invite.Guild.Name, "Details", "Guild", new { id = invite.Guild.Id }, null)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => invite.Guild.Leader.Name)
+                                        </td>
+                                        <td class="text-center">
+                                            @Html.ActionLink("Cancel", "GuildCancelApp", "Guilds", new { id = invite.Id }, new { @class = "btn btn-danger invite-action a-guild-inviteID-" + guildInvites })
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </table>
+                    </div>
+                </div>
+                <div id="menu2" class="tab-pane fade tab-invite">
+                    <h3 style="margin:0;">Invites</h3>
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th>
+                                To
+                            </th>
+                            <th>
+                                Leader
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var item in Model.Characters)
+                        {
+                            foreach (var invite in item.GroupInvites.Where(e => !e.Declined))
+                            {
+
+                                groupInvites++;
+
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink(invite.Group.Leader.Name, "Details", "Groups", new { id = invite.Group.Id }, null)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink("Accept", "groupAccept", "Characters", new { cId = item.Id, iId = invite.Id }, new { @class = "btn btn-success invite-action a-group-inviteID-" + groupInvites })
+                                        @Html.ActionLink("Decline", "groupDecline", "Characters", new { cId = item.Id, iId = invite.Id }, new { @class = "btn btn-danger invite-action d-group-inviteID-" + groupInvites })
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                    <h3>Applications</h3>
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th>
+                                For
+                            </th>
+                            <th>
+                                To
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var item in Model.Characters)
+                        {
+                            foreach (var invite in item.GroupApplications.Where(e => !e.Declined))
+                            {
+
+                                groupInvites++;
+
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => invite.Group.Leader.Name)
+                                    </td>
+                                    <td class="text-center">
+                                        @Html.ActionLink("Cancel", "GroupCancelApp", "Groups", new { id = invite.Id }, new { @class = "btn btn-danger invite-action a-group-inviteID-" + guildInvites })
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+
+                <div id="menu3" class="tab-pane fade tab-invite">
+                    <h3 style="margin:0;">Invites</h3>
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th>
+                                To
+                            </th>
+                            <th>
+                                Raid
+                            </th>
+                            <th>
+                                Leader
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var item in Model.Characters)
+                        {
+                            foreach (var invite in item.RaidInvites.Where(e => !e.Declined))
+                            {
+
+                                raidInvites++;
+
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink(invite.Raid.Event.Name, "Details", "Raids", new { id = invite.Raid.Id }, null)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => invite.Raid.Leader.Name)
+                                        </td>
+                                    <td>
+                                        @Html.ActionLink("Accept", "RaidAccept", "Raids", new { cId = item.Id, iId = invite.Id }, new { @class = "btn btn-success invite-action a-Raid-inviteID-" + raidInvites })
+                                        @Html.ActionLink("Decline", "RaidDecline", "Raids", new { cId = item.Id, iId = invite.Id }, new { @class = "btn btn-danger invite-action d-Raid-inviteID-" + raidInvites })
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                    <h3>Applications</h3>
+                    <table class="table custom-table" style="margin:0;">
+                        <tr>
+                            <th>
+                                For
+                            </th>
+                            <th>
+                                Raid
+                            </th>
+                            <th>
+                                Leader
+                            </th>
+                            <th></th>
+                        </tr>
+                        @foreach (var item in Model.Characters)
+                        {
+                            foreach (var invite in item.RaidApplications.Where(e => !e.Declined))
+                            {
+
+                                raidInvites++;
+
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink(invite.Raid.Event.Name, "Details", "Raids", new { id = invite.Raid.Id }, null)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => invite.Raid.Leader.Name)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink("Cancel", "RaidCancelApp", "Raids", new { id = invite.Id }, new { @class = "btn btn-danger invite-action a-raid-inviteID-" + guildInvites })
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function() {
+
+            var chara = "@chara";
+            if (chara) {
+                $(chara + "-pill").addClass("active");
+                $(chara + "-info").addClass("in active");
+            }
+
+            var invites = new Object();
+
+            invites.guild =  @guildInvites;
+            invites.group =  @groupInvites;
+            invites.raid =  @raidInvites;
+
+            function updateInvites(type) {
+                $("#" + type + "-count").html(invites[type]);
+            }
+
+            Array.for
+
+            for (type in invites) {
+                updateInvites(type);
+            }
+
+            $(".invite-action").click(function(e) {
+
+                var self = $(this);
+
+                e.preventDefault();
+                $.ajax({
+
+                    url:self.attr("href"),
+                    success: function(data) {
+                        var classList = self.attr('class').split(/\s+/);
+                        var inviteClass;
+
+                        $.each(classList, function (index, item) {
+                            if (item.includes("inviteID")) {
+                                inviteClass = item;
+                            }
+                        });
+
+                        self.parent().html(data);
+
+                        var type = inviteClass.split(/-/)[1];
+
+                        invites[type]--;
+                        updateInvites(type);
+                    }
+                });
+            });
+
+            
+            $(".other-action").click(function(e) {
+
+                var self = $(this);
+
+                e.preventDefault();
+                $.ajax({
+
+                    url:self.attr("href"),
+                    success: function(data) {
+                        self.parent().html(data);
+                    }
+                });
+            });
+
+            $(".tab-invite").hide();
+            $("#menu1").show();
+
+            $(".link-tab").click(function(e) {
+                $(".tab-invite").hide();
+                $($(this).attr("href")).show();
+            });
+
+        });
+    </script>
+</div>
+
+<div class="panel panel-default col-lg-12" style="padding:0;">
+
+    <div class="panel-heading">
+        <p class="full-center-spaced">
+            <span class="h4">Raids</span>
+            <span>
+                @Html.ActionLink("View All Raids", "Index", "Raids", null, new { @class = "btn btn-success text-center" }) 
+               @Html.ActionLink("Schedule Raid", "Index", "Events",  null, new { @class = "btn btn-primary text-center" })
+            </span>
+        </p>
+    </div>
+    <div class="panel-body">
+
+        <table class="table custom-table" style="margin:0;">
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Leader
+                </th>
+                <th>
+                    Character
+                </th>
+                <th>
+                    Start Time
+                </th>
+                <th>
+                    </th>
+            </tr>
+            @foreach (var item in Model.Characters)
+            {
+                foreach (var raid in item.Raids)
+                {
+
+                    raids++;
+
+                    <tr>
+                        <td>
+                            @Html.ActionLink(raid.Event.Name, "Details", "Raids", new { id = raid.Id }, null)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => raid.Leader.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => raid.ScheduledTime)
+                        </td>
+                        <td>
+                            @if (raid.Leader.Name != item.Name)
+                            {
+                                @Html.ActionLink("Leave", "RaidLeave", "Raids", new { cid = item.Id, rid = raid.Id }, new { @class = "btn btn-danger other-action" })
+                            }
+                            else
+                            {
+                                @Html.ActionLink("Disband", "RaidDisband", "Raids", new { id = raid.Id }, new { @class = "btn btn-danger other-action" })
+                            }
+                            </td>
+                    </tr>
+                }
+            }
+        </table>
+
+    </div>
+</div>

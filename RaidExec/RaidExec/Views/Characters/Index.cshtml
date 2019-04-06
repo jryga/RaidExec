@@ -1,0 +1,148 @@
+﻿@model IEnumerable<RaidExec.Controllers.CharacterBase>
+
+@{
+    ViewBag.Title = "Index";
+    var games = Model.Select(e => new { Name = e.Game.Name, Id = e.Game.Id }).Distinct();
+}
+
+
+@Scripts.Render("~/bundles/jquery")
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+
+<h2>Characters</h2>
+<br>
+<div class="well">
+    <div class="full-center-spaced">
+        @Html.ActionLink("Create a Character", "CreateCharacter", "UserAccounts", null, new { @class = "btn btn-success" })
+        <div class="input-group" style="display:flex;">
+            <input id="name-filter" type="text" class="form-control" placeholder="Filter by name">
+            <div class="game-filter-select">
+                <select id="game-filter" multiple="multiple">
+                    @foreach (var game in games.OrderBy(e => e.Name))
+                    {
+                        <option value="game-@game.Id-tag">@game.Name</option>
+                    }
+                </select>
+            </div>
+            <script type="text/javascript">
+
+            </script>
+        </div>
+    </div>
+    <br>
+    <div>
+        <table class="table custom-table" style="margin:0;">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserAccount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Game)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.OrderBy(e => e.Name))
+            {
+                <tr class="event-tag game-@item.Game.Id-tag event-visible">
+                    <td class="name-tag" style="height: 100%;">
+                        <div class="full-center" style="height: 100%; width:100%;">
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </div>
+                    </td>
+                    <td>
+                        @Html.ActionLink(item.UserAccount.Name, "Details", "UserAccounts", new { id = item.UserAccount.Id }, new { @class = "btn btn-default", @style = "width:100%;" })
+                    </td>
+                    <td>
+                        @Html.ActionLink(item.Game.Name, "Details", "Games", new { id = item.Game.Id }, new { @class = "btn btn-default", @style = "width:100%;" })
+                    </td>
+                    <td>
+                        <div class="full-center-spaced">
+                            @Html.ActionLink("View Details", "Details", new { id = item.Id }, new { @class = "btn btn-primary" })
+                            @if (User.IsInRole("Admin") || User.Identity.Name == item.UserAccount.Name)
+                            { 
+                                <span>
+                                   <!-- @Html.ActionLink("Edit", "CharacterEdit", "UserAccounts", new { id = item.Id }, new { @class = "btn btn-warning" }) -->
+                                    @Html.ActionLink("Delete", "DeleteCharacter", "UserAccounts",new { id = item.Id }, new { @class = "btn btn-danger" })
+                                </span>                               
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    // These have to be outside
+
+    $('#game-filter').select2({
+        placeholder: "Filter by games",
+        allowClear: true // Broken
+    });
+
+    $('#game-filter').on('select2:select', function (e) {
+        if ($(this).val().length == 1) {
+            $(".event-tag").not("." + e.params.data.id).hide();
+        } else {
+            $("." + e.params.data.id).show();
+        }
+
+        var regex = new RegExp($("#name-filter").val(), "i");
+        $("." + e.params.data.id).each(function () {
+            if (!$(this).find(".name-tag").text().match(regex)) {
+                $(this).hide();
+            }
+        });
+    });
+
+    $('#game-filter').on('select2:unselect', function (e) {
+        if (!$(this).val()) {
+            $(".event-tag").show();
+
+            var regex = new RegExp($("#name-filter").val(), "i");
+            $(".event-tag").each(function () {
+                if (!$(this).find(".name-tag").text().match(regex)) {
+                    $(this).hide();
+                }
+            });
+        } else {
+            $("." + e.params.data.id).hide();
+        }
+    });
+
+    $("#name-filter").on("change keyup paste", function () {
+        var regex = new RegExp($(this).val(), "i");
+        var filters = $("#game-filter").val();
+
+        if (!filters) {
+            $(".event-tag").each(function () {
+                if (!$(this).find(".name-tag").text().match(regex)) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+        } else {
+            for (filter in filters) {
+                $("." + filters[filter]).each(function () {
+                    if ($(this).find(".name-tag").text().match(regex)) {
+                        $(this).show();
+                    }
+                    else {
+                        $(this).hide();
+                    }
+                });
+            }
+        }
+        });
+
+</script>

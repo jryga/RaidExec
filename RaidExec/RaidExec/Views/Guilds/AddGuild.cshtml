@@ -1,0 +1,55 @@
+﻿@model RaidExec.Controllers.GuildAddForm
+
+@{
+    ViewBag.Title = "Create Guild";
+}
+@Scripts.Render("~/bundles/jquery")
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+<script src="//cdn.ckeditor.com/4.5.8/standard/ckeditor.js"></script>
+
+<h2>Create Guild for @Model.LeaderName</h2>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    @Html.Hidden("LeaderId",Model.LeaderId)
+    @Html.Hidden("GameId", Model.GameId)
+
+    <div class="form-horizontal well">
+        <h4>@Model.GameName</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                @if(Model.errorName != "")
+                {
+                    <p><font color="red">@Model.errorName</font></p>
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <script>CKEDITOR.replace('Description');</script>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <div class="full-center-spaced">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                    @Html.ActionLink("Cancel", "Index", "Home", null, new { @class = "btn btn-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Return", "Index", "Home", null, new { @class = "btn btn-warning" })
+</div>
